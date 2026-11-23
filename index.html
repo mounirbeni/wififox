@@ -48,6 +48,15 @@ button:focus-visible,.btn:focus-visible,textarea:focus-visible{outline:2px solid
 .p .name{flex:1;min-width:0}
 .p .num{color:var(--muted);font-size:.85rem;direction:ltr;unicode-bidi:isolate;font-variant-numeric:tabular-nums}
 .p.done .name{color:var(--muted)}
+input{font:inherit;color:var(--fg);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px;width:100%}
+input:focus-visible{outline:2px solid var(--wa);outline-offset:2px}
+label{display:flex;flex-direction:column;gap:4px;font-size:.9rem;font-weight:600;min-width:0}
+.err{color:var(--warn);font-size:.9rem}
+.del{border:0;background:none;color:var(--muted);font-size:1.2rem;padding:4px 8px;flex:none}
+.p{flex:1;min-width:0}
+.line{display:flex;align-items:center;border-top:1px solid var(--line)}
+.line:first-child{border-top:0}
+.line .p{border-top:0}
 .notice{background:var(--warn-soft);color:var(--warn);border-radius:10px;padding:10px 12px;font-size:.9rem}
 details summary{cursor:pointer;color:var(--muted);font-size:.9rem}
 ol{margin:0;padding-inline-start:20px;display:flex;flex-direction:column;gap:4px}
@@ -77,6 +86,16 @@ ol{margin:0;padding-inline-start:20px;display:flex;flex-direction:column;gap:4px
   <!-- Everyone, with a tick when done -->
   <div class="card">
     <div class="list" id="list"></div>
+  </div>
+
+  <!-- Add a person -->
+  <div class="card">
+    <div class="row" style="align-items:flex-end">
+      <label for="aName">الاسم<input id="aName" autocomplete="off"></label>
+      <label for="aPhone">الرقم<input id="aPhone" inputmode="tel" dir="ltr" autocomplete="off" placeholder="06… أو 07… أو +212…"></label>
+    </div>
+    <button id="add">إضافة رقم</button>
+    <p class="err" id="aErr" role="alert" hidden></p>
   </div>
 
   <!-- The message -->
@@ -133,7 +152,8 @@ const DEFAULT_MSG='السلام عليكم 👋\nحان موعد تجديد اش
 
 const KEY='wifi-simple-v1';
 const $=id=>document.getElementById(id);
-let st={done:{},msg:DEFAULT_MSG};
+let st={done:{},msg:DEFAULT_MSG,extra:[]};
+const all=()=>PEOPLE.concat(st.extra||[]);
 try{const s=JSON.parse(localStorage.getItem(KEY));if(s)st=Object.assign(st,s);}catch(e){}
 const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(st))}catch(e){}};
 
@@ -142,6 +162,7 @@ function num(p){
   if(s.startsWith('+'))return s.slice(1);
   if(s.startsWith('00'))return s.slice(2);
   if(s.startsWith('0'))return COUNTRY_CODE+s.slice(1);
+  if(/^[5-7]\d{8}$/.test(s))return COUNTRY_CODE+s; // 6xxxxxxxx without the 0
   return s;
 }
 const link=p=>'https://wa.me/'+num(p[1])+'?text='+encodeURIComponent(st.msg);
@@ -149,8 +170,8 @@ const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',
 function toast(t){const el=$('toast');el.textContent=t;el.classList.add('on');clearTimeout(toast.t);toast.t=setTimeout(()=>el.classList.remove('on'),1800)}
 
 function render(){
-  const total=PEOPLE.length, done=PEOPLE.filter(p=>st.done[num(p[1])]).length;
-  const next=PEOPLE.find(p=>!st.done[num(p[1])]);
+  const P=all(), total=P.length, done=P.filter(p=>st.done[num(p[1])]).length;
+  const next=P.find(p=>!st.done[num(p[1])]);
   $('exampleNote').hidden=!IS_EXAMPLE;
   $('count').textContent=`تم ${done} من ${total}`;
   $('left').textContent=total-done?`بقي ${total-done}`:'';
@@ -158,12 +179,15 @@ function render(){
   const b=$('next');
   if(next){b.href=link(next);b.textContent='إرسال إلى '+next[0];b.dataset.n=num(next[1]);b.removeAttribute('aria-disabled');}
   else{b.removeAttribute('href');b.textContent='✓ وصلت الرسالة للجميع';b.dataset.n='';b.setAttribute('aria-disabled','true');}
-  $('list').innerHTML=PEOPLE.map(p=>{const n=num(p[1]),d=st.done[n];return `
-    <a class="p ${d?'done':''}" href="${esc(link(p))}" target="_blank" rel="noopener" data-n="${n}">
-      <span class="tick">${d?'✓':''}</span>
-      <span class="name">${esc(p[0])}</span>
-      <span class="num">+${n}</span>
-    </a>`}).join('');
+  $('list').innerHTML=P.map((p,i)=>{const n=num(p[1]),d=st.done[n],added=i>=PEOPLE.length;return `
+    <div class="line">
+      <a class="p ${d?'done':''}" href="${esc(link(p))}" target="_blank" rel="noopener" data-n="${n}">
+        <span class="tick">${d?'✓':''}</span>
+        <span class="name">${esc(p[0])}</span>
+        <span class="num">+${n}</span>
+      </a>
+      ${added?`<button class="del" data-del="${n}" aria-label="حذف ${esc(p[0])}">×</button>`:''}
+    </div>`}).join('');
   $('msg').textContent=st.msg;
   save();
 }
@@ -173,6 +197,23 @@ document.addEventListener('click',e=>{
   const a=e.target.closest('a[data-n]');if(!a)return;
   if(!a.dataset.n){e.preventDefault();return;}
   st.done[a.dataset.n]=true;setTimeout(render,50);
+});
+
+function addPerson(){
+  const name=$('aName').value.trim(), raw=$('aPhone').value.trim(), n=num(raw), err=$('aErr');
+  err.hidden=true;
+  if(!name){err.textContent='اكتب الاسم.';err.hidden=false;$('aName').focus();return;}
+  if(!new RegExp('^'+COUNTRY_CODE+'[5-7]\\d{8}$').test(n)){err.textContent='الرقم غير صحيح. اكتبه مثل 0612345678 أو 0712345678 أو +212612345678';err.hidden=false;$('aPhone').focus();return;}
+  if(all().some(p=>num(p[1])===n)){err.textContent='هذا الرقم موجود في اللائحة.';err.hidden=false;return;}
+  st.extra.push([name,'+'+n]);
+  $('aName').value='';$('aPhone').value='';
+  toast('أُضيف '+name);render();
+}
+$('add').onclick=addPerson;
+$('aPhone').addEventListener('keydown',e=>{if(e.key==='Enter')addPerson()});
+$('list').addEventListener('click',e=>{
+  const b=e.target.closest('[data-del]');if(!b)return;
+  st.extra=st.extra.filter(p=>num(p[1])!==b.dataset.del);delete st.done[b.dataset.del];render();
 });
 
 $('copy').onclick=()=>{
