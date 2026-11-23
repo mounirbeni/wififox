@@ -3,64 +3,80 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>رسائل اشتراك الواي فاي</title>
+<title>رسائل الواي فاي</title>
 <meta name="claude:viewport-fit-sides" content="cover">
+<meta name="theme-color" content="#1f8f4e">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="الواي فاي">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;600&family=Readex+Pro:wght@600&display=swap">
 <style>
-/* Layout: one narrow column: message, one big send button, the checklist of people */
+/* Layout: one narrow column: send card, checklist, add form, message */
 :root{
   --bg:#f3f6f7; --card:#ffffff; --fg:#14232b; --muted:#5b6d75; --line:#dbe3e6;
-  --wa:#1f8f4e; --wa-soft:#e3f4ea; --warn:#a35a00; --warn-soft:#fbefdc;
+  --wa:#1f8f4e; --wa-soft:#e3f4ea; --warn:#a35a00; --warn-soft:#fbefdc; --red:#c0362c; --red-ink:#ffffff;
   --f-body:"IBM Plex Sans Arabic",Tahoma,"Segoe UI",sans-serif;
   --f-head:"Readex Pro","IBM Plex Sans Arabic",Tahoma,sans-serif;
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
   --bg:#0e171b; --card:#152227; --fg:#e4ecee; --muted:#94a7ae; --line:#26363c;
-  --wa:#3fb874; --wa-soft:#163325; --warn:#e7a54a; --warn-soft:#3a2b14; color-scheme:dark}}
+  --wa:#3fb874; --wa-soft:#163325; --warn:#e7a54a; --warn-soft:#3a2b14; --red:#e0574c; --red-ink:#ffffff; color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#0e171b; --card:#152227; --fg:#e4ecee; --muted:#94a7ae; --line:#26363c;
-  --wa:#3fb874; --wa-soft:#163325; --warn:#e7a54a; --warn-soft:#3a2b14; color-scheme:dark}
-*{box-sizing:border-box}
+  --wa:#3fb874; --wa-soft:#163325; --warn:#e7a54a; --warn-soft:#3a2b14; --red:#e0574c; --red-ink:#ffffff; color-scheme:dark}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 [hidden]{display:none!important}
-body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.6 var(--f-body);
-  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 60px}
-.wrap{max-width:560px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
-h1{font:600 1.4rem var(--f-head);margin:0;text-wrap:balance}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.6 var(--f-body);overscroll-behavior-y:contain;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  padding-top:calc(16px + env(safe-area-inset-top,0px));padding-bottom:calc(40px + env(safe-area-inset-bottom,0px))}
+.wrap{max-width:560px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
+h1{font:600 1.35rem var(--f-head);margin:0}
 p{margin:0}
 .muted{color:var(--muted);font-size:.9rem}
-.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:12px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:12px}
 .msg{white-space:pre-wrap;background:var(--wa-soft);border-radius:10px;padding:12px}
-textarea{font:inherit;color:var(--fg);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px;width:100%;min-height:140px;resize:vertical}
-button,.btn{font:600 1rem var(--f-body);border:1px solid var(--line);background:var(--card);color:var(--fg);border-radius:10px;padding:10px 16px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:6px}
-button:focus-visible,.btn:focus-visible,textarea:focus-visible{outline:2px solid var(--wa);outline-offset:2px}
-.send{background:var(--wa);color:#fff;border-color:var(--wa);font-size:1.15rem;padding:18px;width:100%}
-.send[aria-disabled="true"]{background:var(--wa-soft);color:var(--wa);cursor:default}
+input,textarea{font:inherit;font-size:16px;color:var(--fg);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:12px;width:100%}
+textarea{min-height:130px;resize:vertical}
+label{display:flex;flex-direction:column;gap:4px;font-size:.9rem;font-weight:600;min-width:0}
+button,.btn{font:600 1rem var(--f-body);border:1px solid var(--line);background:var(--card);color:var(--fg);border-radius:12px;padding:12px 16px;min-height:48px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:6px;touch-action:manipulation}
+:focus-visible{outline:2px solid var(--wa);outline-offset:2px}
+.green{background:var(--wa);color:#fff;border-color:var(--wa)}
+.send{font-size:1.15rem;padding:18px;width:100%}
 .row{display:flex;gap:10px;flex-wrap:wrap}
-.row>*{flex:1 1 140px}
+.row>*{flex:1 1 130px}
 .count{font:600 1.1rem var(--f-head);font-variant-numeric:tabular-nums}
 .bar{height:10px;background:var(--line);border-radius:99px;overflow:hidden}
 .bar i{display:block;height:100%;width:0%;background:var(--wa);transition:width .3s}
-.list{display:flex;flex-direction:column}
-.p{display:flex;align-items:center;gap:12px;padding:10px 4px;border-top:1px solid var(--line);color:inherit;text-decoration:none}
-.p:first-child{border-top:0}
-.p .tick{width:28px;height:28px;flex:none;border-radius:50%;border:2px solid var(--line);display:grid;place-items:center;font-weight:600;color:#fff}
-.p.done .tick{background:var(--wa);border-color:var(--wa)}
-.p .name{flex:1;min-width:0}
-.p .num{color:var(--muted);font-size:.85rem;direction:ltr;unicode-bidi:isolate;font-variant-numeric:tabular-nums}
-.p.done .name{color:var(--muted)}
-input{font:inherit;color:var(--fg);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px;width:100%}
-input:focus-visible{outline:2px solid var(--wa);outline-offset:2px}
-label{display:flex;flex-direction:column;gap:4px;font-size:.9rem;font-weight:600;min-width:0}
 .err{color:var(--warn);font-size:.9rem}
-.del{border:0;background:none;color:var(--muted);font-size:1.2rem;padding:4px 8px;flex:none}
-.p{flex:1;min-width:0}
-.line{display:flex;align-items:center;border-top:1px solid var(--line)}
-.line:first-child{border-top:0}
-.line .p{border-top:0}
 .notice{background:var(--warn-soft);color:var(--warn);border-radius:10px;padding:10px 12px;font-size:.9rem}
-details summary{cursor:pointer;color:var(--muted);font-size:.9rem}
-ol{margin:0;padding-inline-start:20px;display:flex;flex-direction:column;gap:4px}
-.toast{position:fixed;inset:auto 0 calc(16px + env(safe-area-inset-bottom,0px));margin:auto;width:max-content;max-width:90%;background:var(--fg);color:var(--bg);padding:9px 16px;border-radius:99px;opacity:0;transition:opacity .2s;pointer-events:none}
+details summary{cursor:pointer;color:var(--muted);font-size:.95rem;padding:6px 0}
+
+/* Checklist rows: swipe sideways to reveal delete */
+.list{display:flex;flex-direction:column;margin:-4px -16px}
+.item{position:relative;overflow:hidden;border-top:1px solid var(--line)}
+.item:first-child{border-top:0}
+.under{position:absolute;inset:0;background:var(--red);color:var(--red-ink);display:flex;align-items:center;justify-content:space-between;padding:0 20px;font-weight:600}
+.face{position:relative;background:var(--card);display:flex;align-items:center;gap:6px;padding:4px 16px;touch-action:pan-y;transition:transform .2s}
+.face.drag{transition:none}
+.tick{width:44px;height:44px;min-height:0;padding:0;flex:none;border:0;background:none;display:grid;place-items:center}
+.tick span{width:30px;height:30px;border-radius:50%;border:2px solid var(--muted);display:grid;place-items:center;color:#fff;font-weight:700}
+.item.done .tick span{background:var(--wa);border-color:var(--wa)}
+.who{flex:1;min-width:0;display:flex;align-items:center;gap:10px;color:inherit;text-decoration:none;padding:8px 0;user-select:none;-webkit-user-select:none}
+.who .name{flex:1;min-width:0;overflow-wrap:anywhere}
+.who .num{color:var(--muted);font-size:.85rem;direction:ltr;unicode-bidi:isolate;font-variant-numeric:tabular-nums}
+.item.done .name{color:var(--muted)}
+.ask{display:flex;align-items:center;gap:8px;padding:10px 16px;background:var(--warn-soft);flex-wrap:wrap}
+.ask span{flex:1 1 140px;color:var(--warn);font-weight:600}
+.ask button{min-height:42px;padding:8px 14px}
+.red{background:var(--red);color:var(--red-ink);border-color:var(--red)}
+.empty{text-align:center;padding:12px 0;color:var(--muted)}
+
+.toast{position:fixed;inset:auto 0 calc(16px + env(safe-area-inset-bottom,0px));margin:auto;width:max-content;max-width:90%;background:var(--fg);color:var(--bg);padding:10px 18px;border-radius:99px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:5}
 .toast.on{opacity:1}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
@@ -68,37 +84,46 @@ ol{margin:0;padding-inline-start:20px;display:flex;flex-direction:column;gap:4px
 <body>
 <div class="wrap">
 
-  <h1>رسائل اشتراك الواي فاي</h1>
+  <h1>رسائل الواي فاي</h1>
 
-  <div class="notice" id="exampleNote" hidden>هذه أسماء تجريبية. ستُستبدل بلائحتك الحقيقية.</div>
-
-  <!-- The one button -->
-  <div class="card">
+  <!-- Send -->
+  <div class="card" id="sendCard">
     <div class="row" style="align-items:center">
-      <span class="count" id="count">0 من 0</span>
+      <span class="count" id="count"></span>
       <span class="muted" style="text-align:left" id="left"></span>
     </div>
     <div class="bar"><i id="bar"></i></div>
-    <a class="btn send" id="next" target="_blank" rel="noopener">إرسال</a>
-    <p class="muted">اضغط الزر فيفتح واتساب والرسالة جاهزة. اضغط إرسال هناك، ثم ارجع واضغط الزر مرة أخرى للشخص التالي.</p>
+    <a class="btn green send" id="next" target="_blank" rel="noopener">إرسال</a>
+    <button id="markNext">✓ أرسلت له</button>
+    <p class="muted">اضغط "إرسال" فيفتح واتساب والرسالة جاهزة. بعد الإرسال ارجع واضغط "✓ أرسلت له".</p>
   </div>
 
-  <!-- Everyone, with a tick when done -->
+  <!-- Checklist -->
   <div class="card">
     <div class="list" id="list"></div>
+    <p class="muted" id="swipeHint">لحذف شخص: اسحب اسمه إلى اليمين أو اليسار.</p>
   </div>
 
-  <!-- Add a person -->
+  <!-- Add -->
   <div class="card">
     <div class="row" style="align-items:flex-end">
-      <label for="aName">الاسم<input id="aName" autocomplete="off"></label>
-      <label for="aPhone">الرقم<input id="aPhone" inputmode="tel" dir="ltr" autocomplete="off" placeholder="06… أو 07… أو +212…"></label>
+      <label for="aName">الاسم<input id="aName" autocomplete="off" enterkeyhint="next"></label>
+      <label for="aPhone">الرقم<input id="aPhone" type="tel" inputmode="tel" dir="ltr" autocomplete="off" enterkeyhint="done" placeholder="06… / 07… / +212…"></label>
     </div>
-    <button id="add">إضافة رقم</button>
+    <button class="green" id="add">إضافة رقم</button>
     <p class="err" id="aErr" role="alert" hidden></p>
+    <details>
+      <summary>إضافة لائحة كاملة دفعة واحدة</summary>
+      <div style="display:flex;flex-direction:column;gap:10px;margin-top:8px">
+        <label for="bulk">كل سطر: الاسم ثم الرقم
+          <textarea id="bulk" placeholder="أحمد 0612345678&#10;سارة +212698765432"></textarea>
+        </label>
+        <button id="bulkAdd">إضافة اللائحة</button>
+      </div>
+    </details>
   </div>
 
-  <!-- The message -->
+  <!-- Message -->
   <div class="card">
     <div class="msg" id="msg"></div>
     <div class="row">
@@ -107,27 +132,23 @@ ol{margin:0;padding-inline-start:20px;display:flex;flex-direction:column;gap:4px
     </div>
     <div id="editBox" hidden style="display:flex;flex-direction:column;gap:10px">
       <textarea id="tpl" aria-label="نص الرسالة"></textarea>
-      <div class="row"><button id="saveTpl" class="send" style="font-size:1rem;padding:10px">حفظ</button><button id="cancelTpl">إلغاء</button></div>
+      <div class="row"><button id="saveTpl" class="green">حفظ</button><button id="cancelTpl">إلغاء</button></div>
     </div>
   </div>
 
   <!-- New month -->
   <div class="card">
-    <button id="reset">شهر جديد: ابدأ من الأول</button>
+    <button id="reset">شهر جديد: إزالة كل العلامات ✓</button>
     <div id="confirm" hidden style="display:flex;flex-direction:column;gap:10px">
-      <p class="notice">سيتم مسح كل العلامات ✓ لتبدأ الإرسال من جديد.</p>
-      <div class="row"><button id="yes" class="send" style="font-size:1rem;padding:10px">نعم</button><button id="no">إلغاء</button></div>
+      <p class="notice">ستُزال كل العلامات ✓ لتبدأ الإرسال من جديد. الأرقام تبقى كما هي.</p>
+      <div class="row"><button id="yes" class="green">نعم</button><button id="no">إلغاء</button></div>
     </div>
   </div>
 
   <details>
     <summary>طريقة أسرع: قائمة البث في واتساب</summary>
-    <div class="card" style="margin-top:10px">
-      <ol>
-        <li>في واتساب: ⋮ ← بث جديد ← اختر كل المشتركين (مرة واحدة فقط، القائمة تبقى محفوظة).</li>
-        <li>كل شهر: اضغط هنا "نسخ الرسالة"، الصقها في قائمة البث، واضغط إرسال.</li>
-        <li>لا تصل رسالة البث إلا لمن حفظ رقمك. لمن لم يحفظه، استعمل زر "إرسال" في الأعلى.</li>
-      </ol>
+    <div class="card" style="margin-top:8px">
+      <p>في واتساب: ⋮ ← بث جديد ← اختر كل المشتركين (مرة واحدة فقط). كل شهر انسخ الرسالة من هنا والصقها في قائمة البث. تنبيه: لا تصل رسالة البث إلا لمن حفظ رقمك.</p>
     </div>
   </details>
 
@@ -136,98 +157,147 @@ ol{margin:0;padding-inline-start:20px;display:flex;flex-direction:column;gap:4px
 
 <script>
 (function(){
-// ===== The list and the message (edit here) =====
 const COUNTRY_CODE='212';
-const PEOPLE=[
-  // [الاسم, الرقم]
-  ['أحمد','0600000001'],
-  ['سارة','0600000002'],
-  ['يوسف','0600000003'],
-  ['خالد','0600000004'],
-  ['مريم','0600000005'],
-];
-const IS_EXAMPLE=true;
 const DEFAULT_MSG='السلام عليكم 👋\nحان موعد تجديد اشتراك الواي فاي لهذا الشهر.\nالمرجو الدفع في أقرب وقت. شكرا لك 🙏';
-// ================================================
-
-const KEY='wifi-simple-v1';
+const KEY='wifi-app-v2';
 const $=id=>document.getElementById(id);
-let st={done:{},msg:DEFAULT_MSG,extra:[]};
-const all=()=>PEOPLE.concat(st.extra||[]);
-try{const s=JSON.parse(localStorage.getItem(KEY));if(s)st=Object.assign(st,s);}catch(e){}
+
+let st={people:[],done:{},msg:DEFAULT_MSG};
+try{const s=JSON.parse(localStorage.getItem(KEY));if(s&&Array.isArray(s.people))st=Object.assign(st,s);}catch(e){}
 const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(st))}catch(e){}};
 
 function num(p){
-  let s=String(p).replace(/[٠-٩]/g,d=>'٠١٢٣٤٥٦٧٨٩'.indexOf(d)).replace(/[^\d+]/g,'');
+  let s=String(p).replace(/[٠-٩]/g,d=>'٠١٢٣٤٥٦٧٨٩'.indexOf(d)).replace(/[۰-۹]/g,d=>'۰۱۲۳۴۵۶۷۸۹'.indexOf(d)).replace(/[^\d+]/g,'');
   if(s.startsWith('+'))return s.slice(1);
   if(s.startsWith('00'))return s.slice(2);
   if(s.startsWith('0'))return COUNTRY_CODE+s.slice(1);
-  if(/^[5-7]\d{8}$/.test(s))return COUNTRY_CODE+s; // 6xxxxxxxx without the 0
+  if(/^[5-7]\d{8}$/.test(s))return COUNTRY_CODE+s;
   return s;
 }
-const link=p=>'https://wa.me/'+num(p[1])+'?text='+encodeURIComponent(st.msg);
+const valid=n=>new RegExp('^'+COUNTRY_CODE+'[5-7]\\d{8}$').test(n);
+const link=p=>'https://wa.me/'+p.n+'?text='+encodeURIComponent(st.msg);
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 function toast(t){const el=$('toast');el.textContent=t;el.classList.add('on');clearTimeout(toast.t);toast.t=setTimeout(()=>el.classList.remove('on'),1800)}
 
+let asking=null; // number currently asking for delete confirmation
+
 function render(){
-  const P=all(), total=P.length, done=P.filter(p=>st.done[num(p[1])]).length;
-  const next=P.find(p=>!st.done[num(p[1])]);
-  $('exampleNote').hidden=!IS_EXAMPLE;
-  $('count').textContent=`تم ${done} من ${total}`;
-  $('left').textContent=total-done?`بقي ${total-done}`:'';
+  const P=st.people, total=P.length, done=P.filter(p=>st.done[p.n]).length, next=P.find(p=>!st.done[p.n]);
+  $('count').textContent=total?`تم ${done} من ${total}`:'اللائحة فارغة';
+  $('left').textContent=total&&total-done?`بقي ${total-done}`:'';
   $('bar').style.width=(total?done/total*100:0)+'%';
   const b=$('next');
-  if(next){b.href=link(next);b.textContent='إرسال إلى '+next[0];b.dataset.n=num(next[1]);b.removeAttribute('aria-disabled');}
-  else{b.removeAttribute('href');b.textContent='✓ وصلت الرسالة للجميع';b.dataset.n='';b.setAttribute('aria-disabled','true');}
-  $('list').innerHTML=P.map((p,i)=>{const n=num(p[1]),d=st.done[n],added=i>=PEOPLE.length;return `
-    <div class="line">
-      <a class="p ${d?'done':''}" href="${esc(link(p))}" target="_blank" rel="noopener" data-n="${n}">
-        <span class="tick">${d?'✓':''}</span>
-        <span class="name">${esc(p[0])}</span>
-        <span class="num">+${n}</span>
-      </a>
-      ${added?`<button class="del" data-del="${n}" aria-label="حذف ${esc(p[0])}">×</button>`:''}
-    </div>`}).join('');
+  if(next){b.href=link(next);b.textContent='إرسال إلى '+next.name;b.classList.add('green');$('markNext').hidden=false;$('markNext').textContent='✓ أرسلت لـ '+next.name;}
+  else{b.removeAttribute('href');b.textContent=total?'✓ وصلت الرسالة للجميع':'أضف الأرقام أولا';b.classList.remove('green');$('markNext').hidden=true;}
+
+  $('swipeHint').hidden=!total;
+  $('list').innerHTML=total?P.map(p=>{
+    const d=st.done[p.n];
+    if(asking===p.n)return `<div class="item"><div class="ask">
+        <span>حذف ${esc(p.name)} من اللائحة؟</span>
+        <button class="red" data-yes="${p.n}">حذف</button><button data-no>إلغاء</button></div></div>`;
+    return `<div class="item ${d?'done':''}" data-row="${p.n}">
+      <div class="under" aria-hidden="true"><span>حذف</span><span>حذف</span></div>
+      <div class="face">
+        <button class="tick" data-tick="${p.n}" aria-pressed="${!!d}" aria-label="${d?'إزالة العلامة':'وضع علامة'}: ${esc(p.name)}"><span>${d?'✓':''}</span></button>
+        <a class="who" href="${esc(link(p))}" target="_blank" rel="noopener" draggable="false">
+          <span class="name">${esc(p.name)}</span><span class="num">+${p.n}</span>
+        </a>
+      </div></div>`;}).join('')
+    :'<p class="empty">لا توجد أرقام بعد. أضفها من الأسفل.</p>';
   $('msg').textContent=st.msg;
   save();
 }
 
-// Any send link: mark that person done, then move to the next one
-document.addEventListener('click',e=>{
-  const a=e.target.closest('a[data-n]');if(!a)return;
-  if(!a.dataset.n){e.preventDefault();return;}
-  st.done[a.dataset.n]=true;setTimeout(render,50);
-});
-
-function addPerson(){
-  const name=$('aName').value.trim(), raw=$('aPhone').value.trim(), n=num(raw), err=$('aErr');
-  err.hidden=true;
-  if(!name){err.textContent='اكتب الاسم.';err.hidden=false;$('aName').focus();return;}
-  if(!new RegExp('^'+COUNTRY_CODE+'[5-7]\\d{8}$').test(n)){err.textContent='الرقم غير صحيح. اكتبه مثل 0612345678 أو 0712345678 أو +212612345678';err.hidden=false;$('aPhone').focus();return;}
-  if(all().some(p=>num(p[1])===n)){err.textContent='هذا الرقم موجود في اللائحة.';err.hidden=false;return;}
-  st.extra.push([name,'+'+n]);
-  $('aName').value='';$('aPhone').value='';
-  toast('أُضيف '+name);render();
-}
-$('add').onclick=addPerson;
-$('aPhone').addEventListener('keydown',e=>{if(e.key==='Enter')addPerson()});
+// Manual tick
+$('markNext').onclick=()=>{const next=st.people.find(p=>!st.done[p.n]);if(next){st.done[next.n]=true;render();}};
 $('list').addEventListener('click',e=>{
-  const b=e.target.closest('[data-del]');if(!b)return;
-  st.extra=st.extra.filter(p=>num(p[1])!==b.dataset.del);delete st.done[b.dataset.del];render();
+  const t=e.target.closest('[data-tick]');
+  if(t){const n=t.dataset.tick;if(st.done[n])delete st.done[n];else st.done[n]=true;render();return;}
+  const y=e.target.closest('[data-yes]');
+  if(y){const p=st.people.find(x=>x.n===y.dataset.yes);st.people=st.people.filter(x=>x.n!==y.dataset.yes);delete st.done[y.dataset.yes];asking=null;toast('حُذف '+(p?p.name:''));render();return;}
+  if(e.target.closest('[data-no]')){asking=null;render();}
 });
 
+// Swipe to delete (either direction), then confirm
+let sw=null;
+$('list').addEventListener('pointerdown',e=>{
+  const row=e.target.closest('[data-row]');if(!row||e.target.closest('[data-tick]'))return;
+  sw={row,face:row.querySelector('.face'),x:e.clientX,y:e.clientY,dx:0,moved:false,id:e.pointerId};
+});
+$('list').addEventListener('pointermove',e=>{
+  if(!sw||e.pointerId!==sw.id)return;
+  const dx=e.clientX-sw.x, dy=e.clientY-sw.y;
+  if(!sw.moved){
+    if(Math.abs(dy)>10&&Math.abs(dy)>Math.abs(dx)){sw=null;return;} // vertical scroll
+    if(Math.abs(dx)<10)return;
+    sw.moved=true;sw.face.classList.add('drag');
+  }
+  sw.dx=dx;sw.face.style.transform=`translateX(${dx}px)`;
+});
+function endSwipe(){
+  if(!sw)return;
+  const s=sw;sw=null;
+  if(!s.moved)return;
+  s.face.classList.remove('drag');
+  s.row.dataset.swiped='1';setTimeout(()=>{delete s.row.dataset.swiped},300);
+  if(Math.abs(s.dx)>90){asking=s.row.dataset.row;render();}
+  else s.face.style.transform='';
+}
+$('list').addEventListener('pointerup',endSwipe);
+$('list').addEventListener('pointercancel',endSwipe);
+// A swipe must not open WhatsApp
+$('list').addEventListener('click',e=>{const r=e.target.closest('[data-row]');if(r&&r.dataset.swiped&&e.target.closest('a')){e.preventDefault();}},true);
+
+// Add
+function tryAdd(name,raw){
+  const n=num(raw);name=name.trim();
+  if(!name)return 'اكتب الاسم.';
+  if(!valid(n))return 'الرقم غير صحيح. اكتبه مثل 0612345678 أو 0712345678 أو +212612345678';
+  if(st.people.some(p=>p.n===n))return 'هذا الرقم موجود في اللائحة.';
+  st.people.push({name,n});return '';
+}
+function addOne(){
+  const err=tryAdd($('aName').value,$('aPhone').value), el=$('aErr');
+  el.textContent=err;el.hidden=!err;
+  if(err)return;
+  toast('أُضيف '+$('aName').value.trim());$('aName').value='';$('aPhone').value='';render();
+}
+$('add').onclick=addOne;
+$('aName').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();$('aPhone').focus();}});
+$('aPhone').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();addOne();}});
+$('bulkAdd').onclick=()=>{
+  let ok=0,bad=0;
+  $('bulk').value.split(/\n+/).forEach(line=>{
+    line=line.trim();if(!line)return;
+    let m=line.match(/^(.*?)[\s,،;:\-\t]*([+٠-٩0-9][٠-٩0-9\s\-]{5,})\s*$/),name,phone;
+    if(m){name=m[1].replace(/[,،;:\-\s]+$/,'');phone=m[2];}
+    else if((m=line.match(/^([+٠-٩0-9][٠-٩0-9\s\-]{5,}?)[\s,،;:\-\t]+(\D.*)$/))){phone=m[1];name=m[2];}
+    if(m&&!tryAdd(name,phone))ok++;else bad++;
+  });
+  if(ok)$('bulk').value='';
+  toast(`أُضيف ${ok}`+(bad?` · ${bad} سطر فيه خطأ أو مكرر`:''));render();
+};
+
+// Message
 $('copy').onclick=()=>{
-  try{navigator.clipboard.writeText(st.msg).then(()=>toast('تم نسخ الرسالة'),()=>toast('لم ينجح النسخ، انسخها يدويا'));}
-  catch(e){toast('لم ينجح النسخ، انسخها يدويا');}
+  try{navigator.clipboard.writeText(st.msg).then(()=>toast('تم نسخ الرسالة'),()=>toast('لم ينجح النسخ'));}catch(e){toast('لم ينجح النسخ');}
 };
 $('edit').onclick=()=>{$('tpl').value=st.msg;$('editBox').hidden=false;$('tpl').focus();};
 $('cancelTpl').onclick=()=>{$('editBox').hidden=true;};
 $('saveTpl').onclick=()=>{st.msg=$('tpl').value.trim()||DEFAULT_MSG;$('editBox').hidden=true;toast('تم الحفظ');render();};
+
+// New month
 $('reset').onclick=()=>{$('confirm').hidden=false;};
 $('no').onclick=()=>{$('confirm').hidden=true;};
 $('yes').onclick=()=>{st.done={};$('confirm').hidden=true;toast('ابدأ الإرسال من جديد');render();};
 
 render();
+
+// Installable app + offline
+if('serviceWorker' in navigator&&location.protocol==='https:'){
+  navigator.serviceWorker.register('sw.js').catch(()=>{});
+}
 })();
 </script>
 </body>
